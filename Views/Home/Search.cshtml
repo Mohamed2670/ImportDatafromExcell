@@ -1,0 +1,119 @@
+@model PagedResult<Product>
+
+@{
+    ViewData["Title"] = "Product Search";
+}
+
+<h2 class="title">Product Search</h2>
+
+<!-- Search Form -->
+<form method="get" asp-action="Search" class="search-form">
+    <input type="text" class="search-input" name="searchTerm" value="@ViewData["SearchTerm"]" placeholder="Search..." />
+    <button type="submit" class="search-button">Search</button>
+</form>
+
+<!-- Product Table -->
+<div class="table-container">
+    <table class="product-table">
+        <thead>
+            <tr>
+                <th>Band Number</th>
+                <th>Category Code</th>
+                <th>Manufacturer</th>
+                <th>Part SKU</th>
+                <th>Description</th>
+                <th>List Price</th>
+                <th>Min Discount</th>
+                <th>Discount Price</th>
+            </tr>
+        </thead>
+        <tbody>
+            @if (Model.Items != null && Model.Items.Any())
+            {
+                foreach (var product in Model.Items)
+                {
+                    <tr>
+                        <td>@product.BandNumber</td>
+                        <td>@product.CategoryCode</td>
+                        <td>@product.Manufacturer</td>
+                        <td>@product.PartSku</td>
+                        <td>@product.ItemDescription</td>
+                        <td>@product.ListPrice.ToString("C")</td>
+                        <td>@product.MinDiscount.ToString("C")</td>
+                        <td>@product.DiscountPrice.ToString("C")</td>
+                    </tr>
+                }
+            }
+            else
+            {
+                <tr>
+                    <td colspan="8" class="no-data">No data available</td>
+                </tr>
+            }
+        </tbody>
+    </table>
+</div>
+
+<!-- Pagination -->
+<div class="pagination-container">
+    @if (Model.TotalPages > 1)
+    {
+        <nav>
+            <ul class="pagination">
+                @if (Model.CurrentPage > 1)
+                {
+                    <li class="page-item">
+                        <a class="page-link" asp-action="Search" asp-route-page="1" asp-route-searchTerm="@ViewData["SearchTerm"]">&lt;&lt;</a>
+                    </li>
+                    <li class="page-item">
+                        <a class="page-link" asp-action="Search" asp-route-page="@((Model.CurrentPage - 1))" asp-route-searchTerm="@ViewData["SearchTerm"]">&lt;</a>
+                    </li>
+                }
+
+                @for (int i = 1; i <= Model.TotalPages; i++)
+                {
+                    if (i == 1 || i == Model.TotalPages || (i >= Model.CurrentPage - 1 && i <= Model.CurrentPage + 1))
+                    {
+                        <li class="page-item @(i == Model.CurrentPage ? "active" : "")">
+                            @if (i == Model.CurrentPage)
+                            {
+                                <span class="page-link">@i</span>
+                            }
+                            else
+                            {
+                                <a class="page-link" asp-action="Search" asp-route-page="@i" asp-route-searchTerm="@ViewData["SearchTerm"]">@i</a>
+                            }
+                        </li>
+                    }
+                    else if (i == 2 || i == Model.TotalPages - 1)
+                    {
+                        if (i != Model.CurrentPage - 1 && i != Model.CurrentPage + 1)
+                        {
+                            <li class="page-item disabled">
+                                <span class="page-link">...</span>
+                            </li>
+                        }
+                    }
+                }
+
+                @if (Model.CurrentPage < Model.TotalPages)
+                {
+                    <li class="page-item">
+                        <a class="page-link" asp-action="Search" asp-route-page="@((Model.CurrentPage + 1))" asp-route-searchTerm="@ViewData["SearchTerm"]">&gt;</a>
+                    </li>
+                    <li class="page-item">
+                        <a class="page-link" asp-action="Search" asp-route-page="@Model.TotalPages" asp-route-searchTerm="@ViewData["SearchTerm"]">&gt;&gt;</a>
+                    </li>
+                }
+            </ul>
+        </nav>
+    }
+</div>
+
+<!-- Export to Excel -->
+<div class="export-container">
+    <form method="post" asp-action="ExportToExcel">
+        <input type="hidden" name="searchTerm" value="@ViewData["SearchTerm"]" />
+        <button type="submit" class="export-button">Export to Excel</button>
+    </form>
+</div>

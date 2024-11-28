@@ -1,0 +1,28 @@
+﻿@{
+    ViewData["Title"] = "Home Page";
+}
+
+<h2>Import Products</h2>
+<form asp-action="Import" asp-controller="Home" method="post" enctype="multipart/form-data" onsubmit="return validateFile()">
+    <div class="form-group">
+        <label for="file">Upload Excel File:</label>
+        <input type="file" name="file" id="file" class="form-control" />
+    </div>
+    <button type="submit" class="btn btn-primary">Upload</button>
+</form>
+
+<script>
+    function validateFile() {
+        const fileInput = document.getElementById('file');
+        if (!fileInput.files || fileInput.files.length === 0) {
+            alert('Please select a file to upload.');
+            return false;
+        }
+        return true;
+    }
+</script>
+
+
+
+
+
